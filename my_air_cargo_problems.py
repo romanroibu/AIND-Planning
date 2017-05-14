@@ -92,9 +92,31 @@ class AirCargoProblem(Problem):
 
             :return: list of Action objects
             """
-            unloads = []
-            # TODO create all Unload ground actions from the domain Unload action
-            return unloads
+            def unload(cargo, plane, airport) -> Action:
+                precond_pos = [
+                    in_expr((cargo, plane)),
+                    at_expr((plane, airport)),
+                ]
+                precond_neg = [
+                ]
+
+                effect_add = [
+                    at_expr((cargo, airport)),
+                ]
+                effect_rem = [
+                    in_expr((cargo, plane)),
+                ]
+
+                return Action(
+                    expr('Unload({c}, {p}, {a})'.format(c=cargo, p=plane, a=airport)),
+                    [ precond_pos, precond_neg ],
+                    [ effect_add,  effect_rem  ]
+                )
+
+            # Generate all possible combinations of arguments for load function
+            tuples = itertools.product(self.cargos, self.planes, self.airports)
+
+            return [ unload(*t) for t in tuples ]
 
         def fly_actions():
             """Create all concrete Fly actions and return a list
