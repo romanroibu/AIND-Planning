@@ -149,9 +149,15 @@ class AirCargoProblem(Problem):
             e.g. 'FTTTFF'
         :return: list of Action objects
         """
-        # TODO implement
-        possible_actions = []
-        return possible_actions
+        # Create the knowledge base with sentences from state
+        kb = PropKB(decode_state(state, self.state_map).sentence())
+
+        # Check is the action can be executed in the given state
+        def is_possible(action: Action) -> bool:
+            return action.check_precond(kb, action.args)
+
+        # Return the list of all possible actions
+        return list(filter(is_possible, self.get_actions()))
 
     def result(self, state: str, action: Action):
         """ Return the state that results from executing the given
