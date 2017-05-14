@@ -11,6 +11,7 @@ from my_planning_graph import PlanningGraph
 
 from functools import lru_cache
 
+import types
 import itertools
 import functools
 from aimacode.logic import inspect_literal
@@ -224,9 +225,41 @@ class AirCargoProblem(Problem):
         conditions by ignoring the preconditions required for an action to be
         executed.
         """
-        # TODO implement (see Russell-Norvig Ed-3 10.2.3  or Russell-Norvig Ed-2 11.2)
-        count = 0
-        return count
+        # Alternative implementation of Action.act
+        # That ignores checking if the preconditions are satisfied
+        def unchecked_act(self, kb, args):
+            # remove negative literals
+            for clause in self.effect_rem:
+                kb.retract(self.substitute(clause, args))
+            # add positive literals
+            for clause in self.effect_add:
+                kb.tell(self.substitute(clause, args))
+
+        # Recursively returns the number of actions that must be carried out
+        # From any of the passed states to reach a goal state
+        def count_to_goal(states: [str], actions: [Action], count: int=0) -> int:
+
+            # Check if any of the passed states is a goal state
+            if any(map(self.goal_test, states)):
+                return count
+
+            # Generate next iteration states by calling self.result
+            # With all combinations of current states and actions
+            arguments   = itertools.product(states, actions)
+            next_states = [ self.result(s, a) for (s, a) in arguments ]
+
+            return count_to_goal(next_states, actions, count+1)
+
+        # Get all possible actions
+        all_actions = self.get_actions()
+
+        for action in all_actions:
+            # Swap the implementation of Action.act with the unchecked alternative
+            # This will ensure that no exception is raised when calling self.result
+            action.act = types.MethodType(unchecked_act, action)
+
+        # Recursively count the number of actions
+        return count_to_goal([node.state], all_actions)
 
 
 def air_cargo_p1() -> AirCargoProblem:
