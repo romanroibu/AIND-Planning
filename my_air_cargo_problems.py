@@ -13,6 +13,7 @@ from functools import lru_cache
 
 import itertools
 import functools
+from aimacode.logic import inspect_literal
 
 class AirCargoProblem(Problem):
     def __init__(self, cargos, planes, airports, initial: FluentState, goal: list):
@@ -168,8 +169,22 @@ class AirCargoProblem(Problem):
         :param action: Action applied
         :return: resulting state after action
         """
-        # TODO implement
-        new_state = FluentState([], [])
+        # Create the knowledge base with sentences from state
+        kb = PropKB(decode_state(state, self.state_map).sentence())
+
+        # Executes the action on the state's knowledge base
+        action(kb, action.args)
+
+        # Check if the knowlegde base clause is positive
+        def is_positive(clause: str) -> bool:
+            _, bool_value = inspect_literal(clause)
+            return bool_value
+
+        # Partition all knowledge base clauses into positive and negative
+        pos_list, neg_list = map(list, partition(is_positive, kb.clauses))
+
+        # Create a new state from the updated knowledge base
+        new_state = FluentState(pos_list, neg_list)
         return encode_state(new_state, self.state_map)
 
     def goal_test(self, state: str) -> bool:
@@ -329,5 +344,9 @@ def at_expr(tup):
 
 def in_expr(tup):
     return expr('In({}, {})'.format(tup[0], tup[1]))
+
+def partition(pred, iterable):
+    t1, t2 = itertools.tee(iterable)
+    return filter(pred, t1), itertools.filterfalse(pred, t2)
 
 
