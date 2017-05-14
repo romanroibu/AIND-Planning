@@ -207,8 +207,21 @@ def air_cargo_p2() -> AirCargoProblem:
 
 
 def air_cargo_p3() -> AirCargoProblem:
-    # TODO implement Problem 3 definition
-    pass
+    # Define all objects, according to problem definition
+    cargos = ['C1', 'C2', 'C3', 'C4']
+    planes = ['P1', 'P2']
+    airports = ['JFK', 'SFO', 'ATL', 'ORD']
+
+    # Write positive tuples, according to problem definition
+    pos_at = [('C1', 'SFO'), ('C2', 'JFK'), ('C3', 'ATL'), ('C4', 'ORD'), ('P1', 'SFO'), ('P2', 'JFK')]
+    pos_in = []
+
+    # Write goal tuples, according to problem definition
+    goal_at = [('C1', 'JFK'), ('C2', 'SFO'), ('C3', 'JFK'), ('C4', 'SFO')]
+    goal_in = []
+
+    return problem(cargos, planes, airports, pos_at, pos_in, goal_at, goal_in)
+
 
 ### PRIVATE HELPERS
 
