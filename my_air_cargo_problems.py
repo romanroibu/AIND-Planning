@@ -11,6 +11,8 @@ from my_planning_graph import PlanningGraph
 
 from functools import lru_cache
 
+import itertools
+import functools
 
 class AirCargoProblem(Problem):
     def __init__(self, cargos, planes, airports, initial: FluentState, goal: list):
@@ -195,3 +197,62 @@ def air_cargo_p2() -> AirCargoProblem:
 def air_cargo_p3() -> AirCargoProblem:
     # TODO implement Problem 3 definition
     pass
+
+### PRIVATE HELPERS
+
+def problem(cargos, planes, airports, positive_at, positive_in, goal_at, goal_in) -> AirCargoProblem:
+    # Generate all possible expression tuples
+    all_at_tup = at_tuples(cargos, planes, airports)
+    all_in_tup = in_tuples(cargos, planes, airports)
+    all_expr = expressions(all_at_tup, all_in_tup)
+
+    # Generate positive expressions from tuples
+    pos = expressions(positive_at, positive_in)
+
+    # Generate negative expressions by subtracting positive expressions
+    neg = list(set(all_expr) - set(pos))
+
+    # Generate goal expressions from tuples
+    goal = expressions(goal_at, goal_in)
+
+    init = FluentState(pos, neg)
+    return AirCargoProblem(cargos, planes, airports, init, goal)
+
+def expressions(at_tuples, in_tuples) -> [str]:
+    """
+    Transform 'At' and 'In' expression tuples into a list of expressions
+    """
+
+    # Transform tuples into 'At' and 'In' expressions
+    at_expressions = map(at_expr, at_tuples)
+    in_expressions = map(in_expr, in_tuples)
+
+    # Chain 'At' and 'In' expression iterators together and return as list
+    all_expressions = itertools.chain(at_expressions, in_expressions)
+
+    return list(all_expressions)
+
+def at_tuples(cargos, planes, airports):
+    """
+    Generate 'At' expression tuples, according to the problem domain
+    """
+    cargos_at_airports = itertools.product(cargos, airports)
+    planes_at_airports = itertools.product(planes, airports)
+
+    return itertools.chain(cargos_at_airports, planes_at_airports)
+
+def in_tuples(cargos, planes, airports):
+    """
+    Generate 'In' expression tuples, according to the problem domain
+    """
+    cargos_in_planes   = itertools.product(cargos, planes)
+
+    return cargos_in_planes
+
+def at_expr(tup):
+    return expr('At({}, {})'.format(tup[0], tup[1]))
+
+def in_expr(tup):
+    return expr('In({}, {})'.format(tup[0], tup[1]))
+
+
