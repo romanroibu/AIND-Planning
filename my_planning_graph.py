@@ -3,6 +3,8 @@ from aimacode.search import Problem
 from aimacode.utils import expr
 from lp_utils import decode_state
 
+from itertools import permutations, product, chain
+from functools import partial
 
 class PgNode():
     """Base class for planning graph nodes.
