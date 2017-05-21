@@ -419,8 +419,16 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-        # TODO test for Interference between nodes
-        return False
+        # Test whether node_a1's preconditions are nogated by node_a2's effects
+        def test_interference(node_a1, node_a2):
+            # Get preconditions and effects for action nodes
+            pairs = product(node_a1.precond_s_nodes(), node_a2.effect_s_nodes())
+
+            # Test mutex for any possible pair of precondition and effect
+            return any(self.negation_mutex(*pair) for pair in pairs)
+
+        # Test interference for any permutation of node_a1 and node_a2
+        return any(test_interference(*pair) for pair in permutations([node_a1, node_a2]))
 
     def competing_needs_mutex(self, node_a1: PgNode_a, node_a2: PgNode_a) -> bool:
         """
