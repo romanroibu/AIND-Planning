@@ -502,7 +502,30 @@ class PlanningGraph():
 
         :return: int
         """
+        # Decode the problem's goal FluentState
+        goal_state = decode_state(self.problem.goal, self.problem.state_map)
+
+        # Get nodes for positive and negative fluent literals
+        pos_nodes = map(partial(PgNode_s, is_pos=True),  goal_state.pos)
+        neg_nodes = map(partial(PgNode_s, is_pos=False), goal_state.neg)
+
+        # Create the goals set from positive and negative nodes
+        goals = set(chain(pos_nodes, neg_nodes))
+
         level_sum = 0
-        # TODO implement
-        # for each goal in the problem, determine the level cost, then add them together
+
+        # Iterate over all S levels
+        for level, nodes in enumerate(self.s_levels):
+            # If level cost for all goals were found, return sum
+            if not goals:
+                return level_sum
+
+            # Look for any goal literal in current level
+            for goal in set(goals):
+                # If literal is found in current level
+                # Add level to sum and mark goal literal as found
+                if goal in nodes:
+                    level_sum += level
+                    goals.remove(goal)
+
         return level_sum
