@@ -440,9 +440,8 @@ class PlanningGraph():
         :param node_a2: PgNode_a
         :return: bool
         """
-
-        # TODO test for Competing Needs between nodes
-        return False
+        # Test mutex for any pair of node_a1 and node_a2 preconditions
+        return any(PgNode.is_mutex(*pair) for pair in product(node_a1.parents, node_a2.parents))
 
     def update_s_mutex(self, nodeset: set):
         """ Determine and update sibling mutual exclusion for S-level nodes
