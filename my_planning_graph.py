@@ -502,15 +502,8 @@ class PlanningGraph():
 
         :return: int
         """
-        # Decode the problem's goal FluentState
-        goal_state = decode_state(self.problem.goal, self.problem.state_map)
-
-        # Get nodes for positive and negative fluent literals
-        pos_nodes = map(partial(PgNode_s, is_pos=True),  goal_state.pos)
-        neg_nodes = map(partial(PgNode_s, is_pos=False), goal_state.neg)
-
-        # Create the goals set from positive and negative nodes
-        goals = set(chain(pos_nodes, neg_nodes))
+        # Get positive fluents from the problem's goal state
+        goals = set(PgNode_s(e, True)  for e in self.problem.goal)
 
         level_sum = 0
 
