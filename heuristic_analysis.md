@@ -63,8 +63,12 @@
 | # goal tests | `13` | `81` | `244` |
 | plan length | `6` | `9` | `13` |
 
-The `ignore preconditions` heuristic (being a relaxed version of the original problem, and thus - admissible) was guaranteed to find the optimal solution for all problems. It was able to find a solution faster than using a planning graph and with `levelsum` heuristic, which did not find an optimal solution for all problems (the heuristic is not admissible). However, using `levelsum` resulted in considerably fewer expansions, but the time spent computing the heuristic for each expansion cancels that.
+The `ignore preconditions` heuristic (being a relaxed version of the original problem, and thus - admissible [1]) was guaranteed to find the optimal solution for all problems. It was able to find a solution faster than using a planning graph and with `levelsum` heuristic, which did not find an optimal solution for all problems (the heuristic is not admissible [1]). However, using `levelsum` resulted in considerably fewer expansions, but the time spent computing the heuristic for each expansion cancels that.
 
 ## Conclusions
 
 The heuristic that yielded the best results was `ignore preconditions`. Compared to non-heuristic search, it expanded less nodes than `BFS`, but still found optimal solutions for each problem (compared to `DFS`). While planning graph and with `levelsum` heuristic solution for the third problem was not optimal, it was very close (1 extra action on solution) while expanding fewer nodes than any other search algorithm.
+
+---
+
+1. Stuart J. Russell and Peter Norvig (2009) "Artificial Intelligence: A Modern Approach" Prentice Hall
